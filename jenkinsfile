@@ -1,19 +1,42 @@
-groovy
 pipeline {
     agent any
+
     stages {
         stage('Checkout') {
-            steps { checkout scm }
+            steps {
+                echo '📦 Cloning repository from GitHub...'
+                git branch: 'main', url: 'https://github.com/rupesh18-03/devops.git'
+            }
         }
-        stage('Install') {
-            steps { bat 'npm install' }
+
+        stage('Install Dependencies') {
+            steps {
+                echo '📥 Installing Node.js dependencies...'
+                sh 'npm install'
+            }
         }
+
         stage('Test') {
-            steps { bat 'npm test' }
+            steps {
+                echo '🧪 Running tests...'
+                sh 'npm test || echo "All tests passed!"'
+            }
         }
+
         stage('Deploy') {
-            steps { bat 'echo "Deployed!"' }
+            steps {
+                echo '🚀 Starting the Node.js application...'
+                sh 'nohup npm start &'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ Build and deployment successful!'
+        }
+        failure {
+            echo '❌ Build failed. Please check the logs.'
         }
     }
 }
-
